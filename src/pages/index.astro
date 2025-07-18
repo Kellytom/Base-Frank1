@@ -1,0 +1,20 @@
+---
+import CentralSite from '../components/CentralSite.astro';
+import '../styles/main.css';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hacker1 v1.0 - Development Ecosystem | Central Hub</title>
+    <meta name="description" content="Hacker1 v1.0 - A comprehensive web development platform built with Astro.js, featuring satellite sites for Design, Engineering, Production, and Finished Work." />
+    <meta name="keywords" content="web development, astro, react, three.js, d3.js, development ecosystem" />
+    <meta name="author" content="Hacker1 Development Team" />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`} />
+    <link href="https://fonts.googleapis.com/css2?family=Century+Schoolbook&family=Roboto:wght@400;500&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
+  </head>
+  <body class="dark-mode custom-background">
+    <CentralSite />
+  </body>
+</html>

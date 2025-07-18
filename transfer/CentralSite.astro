@@ -1,0 +1,347 @@
+---
+import Navbar from './Navbar.astro';
+
+const categories = [
+  {
+    name: 'Site-Design',
+    description: 'Planning, wireframes, and user experience design',
+    link: `${import.meta.env.BASE_URL}site-design`,
+    class: 'site-design-card'
+  },
+  {
+    name: 'Site-Engineering', 
+    description: 'Technical implementation and development',
+    link: `${import.meta.env.BASE_URL}site-engineering`,
+    class: 'site-engineering-card'
+  },
+  {
+    name: 'In-Production',
+    description: 'Live projects and deployment management', 
+    link: `${import.meta.env.BASE_URL}in-production`,
+    class: 'in-production-card'
+  },
+  {
+    name: 'Finished-Work',
+    description: 'Completed projects and portfolio showcase',
+    link: `${import.meta.env.BASE_URL}finished-work`,
+    class: 'finished-work-card'
+  }
+];
+---
+
+<!-- Add the navbar at the top -->
+<Navbar />
+
+<div class="central-site">
+  <header class="hero">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title is-3">Hacker1</h1>
+        <h2 class="subtitle is-5">Development Ecosystem v1.0</h2>
+        <p class="hero-description">
+          "In the beginning was the Word, and the Word was with God, and the Word was God." - John 1:1
+        </p>
+        <p>
+          A comprehensive development platform integrating design, engineering, production, and showcase capabilities.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Finished Work Showcase Section -->
+    <section class="section">
+      <div class="finished-work-showcase">
+        <div class="showcase-header">
+          <h2 class="showcase-title">Finished Work Gallery</h2>
+          <a href={`${import.meta.env.BASE_URL}finished-work`} class="button is-primary view-all-button">View All →</a>
+        </div>
+        <p class="showcase-description">
+          Explore our completed projects across five distinct categories
+        </p>
+        <div class="columns is-multiline">
+          <div class="column is-one-fifth">
+            <div class="card finished-work-preview written-preview">
+              <div class="card-content">
+                <a href={`${import.meta.env.BASE_URL}finished-work/written`} class="button is-small is-light">View Written</a>
+                <h4 class="title is-6">Written</h4>
+                <p>Scripture, classics, and literary content</p>
+              </div>
+            </div>
+          </div>
+          <div class="column is-one-fifth">
+            <div class="card finished-work-preview graphic-preview">
+              <div class="card-content">
+                <a href={`${import.meta.env.BASE_URL}finished-work/graphic`} class="button is-small is-light">View Graphics</a>
+                <h4 class="title is-6">Graphic</h4>
+                <p>SVGs from mathematical and spiritual concepts</p>
+              </div>
+            </div>
+          </div>
+          <div class="column is-one-fifth">
+            <div class="card finished-work-preview two-d-preview">
+              <div class="card-content">
+                <a href={`${import.meta.env.BASE_URL}finished-work/two-d`} class="button is-small is-light">View 2D</a>
+                <h4 class="title is-6">Two-D</h4>
+                <p>D3.js visualizations and data representations</p>
+              </div>
+            </div>
+          </div>
+          <div class="column is-one-fifth">
+            <div class="card finished-work-preview three-d-preview">
+              <div class="card-content">
+                <a href={`${import.meta.env.BASE_URL}finished-work/three-d`} class="button is-small is-light">View 3D</a>
+                <h4 class="title is-6">Three-D</h4>
+                <p>Three.js 3D models and scientific visualizations</p>
+              </div>
+            </div>
+          </div>
+          <div class="column is-one-fifth">
+            <div class="card finished-work-preview action-preview">
+              <div class="card-content">
+                <a href={`${import.meta.env.BASE_URL}finished-work/action`} class="button is-small is-light">Play Action</a>
+                <h4 class="title is-6">Action</h4>
+                <p>Interactive game-like experiences</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Satellite Sites Section -->
+    <section class="section">
+      <h2 class="section-title">Development Ecosystem Sites</h2>
+      <div class="columns is-multiline">
+        {categories.map(category => (
+          <div class="column is-half">
+            <div class={`card satellite-card ${category.class}`}>
+              <div class="card-content">
+                <h3 class="title is-4">{category.name}</h3>
+                <p class="content">{category.description}</p>
+                <div class="buttons">
+                  <a href={category.link} class="button is-primary">
+                    Enter {category.name}
+                  </a>
+                  <a href={`${category.link.replace('finished-work', 'finished-work/written')}-ch1`} class="button is-light">
+                    Chapter 1
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="about-section">
+        <div class="content about-content">
+          <h2>About Hacker1</h2>
+          <p>
+            "Whatever you do, work at it with all your heart, as working for the Lord, not for human masters." - Colossians 3:23
+          </p>
+          <p>
+            This platform represents the complete software development lifecycle, from initial planning 
+            through production deployment. Each satellite site focuses on a specific aspect of the development process.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<style>
+  .central-site {
+    min-height: 100vh;
+  }
+
+  .hero {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 3rem 0;
+  }
+
+  .hero-description {
+    font-style: italic;
+    margin: 1rem 0;
+    font-size: 1.1rem;
+  }
+
+  .satellite-card {
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .satellite-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  .site-design-card {
+    border-left: 4px solid #5a7a9a; /* Muted steel blue */
+  }
+
+  .site-engineering-card {
+    border-left: 4px solid #6b8e65; /* Muted sage green - much softer */
+  }
+
+  .in-production-card {
+    border-left: 4px solid #a0756b; /* Muted terra cotta */
+  }
+
+  .finished-work-card {
+    border-left: 4px solid #b8956a; /* Muted bronze/gold */
+  }
+
+  .buttons {
+    margin-top: 1rem;
+  }
+
+  .content {
+    text-align: left;
+  }
+
+  .about-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  .about-content {
+    background: rgba(0, 0, 0, 0.85);
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f5f5f5;
+    line-height: 1.6;
+  }
+
+  .about-content h2 {
+    color: #e8d5b7;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    border-bottom: 2px solid #6b8e65;
+    padding-bottom: 0.5rem;
+  }
+
+  .about-content p {
+    margin-bottom: 1rem;
+    color: #f0f0f0;
+  }
+
+  .about-content p:first-of-type {
+    font-style: italic;
+    color: #e8d5b7;
+    border-left: 3px solid #b8956a;
+    padding-left: 1rem;
+    margin-left: 0;
+  }
+
+  /* Finished Work Showcase Styles */
+  .finished-work-showcase {
+    margin-bottom: 3rem;
+    padding: 2rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .showcase-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: baseline;
+    margin-bottom: 1rem;
+    gap: 2rem;
+  }
+
+  .showcase-title {
+    color: #e8d5b7;
+    font-size: 1.8rem;
+    margin-bottom: 0;
+    border-bottom: 3px solid #b8956a;
+    padding-bottom: 0.5rem;
+    flex: 0 0 auto;
+    text-align: left;
+  }
+
+  .view-all-button {
+    flex-shrink: 0;
+    white-space: nowrap;
+    align-self: baseline;
+    margin-bottom: 0;
+  }
+
+  .showcase-description {
+    text-align: center;
+    color: #c0c0c0;
+    margin-bottom: 2rem;
+    font-style: italic;
+  }
+
+  .finished-work-preview {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 1rem;
+    min-height: 120px;
+  }
+
+  .finished-work-preview:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .finished-work-preview .card-content {
+    padding: 1rem;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    padding-top: 1.25rem;
+  }
+
+  .finished-work-preview .button {
+    margin-bottom: 0.75rem;
+    align-self: flex-start;
+    width: fit-content;
+  }
+
+  .finished-work-preview .title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    margin-top: 0;
+  }
+
+  .finished-work-preview p {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    color: #c0c0c0;
+  }
+
+  .written-preview {
+    border-top: 3px solid #8b7355; /* Muted brown for text */
+  }
+
+  .graphic-preview {
+    border-top: 3px solid #6b8e65; /* Muted sage for graphics */
+  }
+
+  .two-d-preview {
+    border-top: 3px solid #5a7a9a; /* Muted blue for 2D */
+  }
+
+  .three-d-preview {
+    border-top: 3px solid #8e6b8e; /* Muted purple for 3D */
+  }
+
+  .action-preview {
+    border-top: 3px solid #a0756b; /* Muted terra cotta for action */
+  }
+
+  .section-title {
+    color: #e8d5b7;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    border-bottom: 2px solid #6b8e65;
+    display: inline-block;
+    padding-bottom: 0.5rem;
+    width: 100%;
+  }
+</style>

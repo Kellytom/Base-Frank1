@@ -1,0 +1,524 @@
+---
+// ***************************************************************************
+// WORK IN PROGRESS - NEEDS APPROVAL
+// Last updated: 2025-07-07
+// Description: Top navigation bar moved to top, one line, sans-serif
+// Important: This is a draft change that needs review and approval
+// ***************************************************************************
+// Enhanced navbar using astro-navbar 
+// import Search from '@astrojs/starlight/components/Search.astro';
+import { Astronav, MenuItems, MenuIcon, Dropdown, DropdownItems } from "astro-navbar";
+---
+
+<div class="custom-navbar floating-top">
+  <div class="navbar-container">
+    <Astronav closeOnClick>
+      <!-- Left side navigation -->
+      <div class="navbar-brand">
+        <a href={import.meta.env.BASE_URL} class="brand-link">Hacker1</a>
+      </div>
+      
+      <MenuItems class="navbar-menu-horizontal">
+        <div class="menu-items-wrapper">
+          <a href={import.meta.env.BASE_URL} class="nav-item">Home</a>
+          
+          <Dropdown class="dropdown">
+            <button class="dropdown-toggle">
+              <span>Designs</span>
+            </button>
+            <DropdownItems class="dropdown-menu">
+              <div class="dropdown-content">
+                <a href={`${import.meta.env.BASE_URL}backgrounds`} class="dropdown-item">Backgrounds</a>
+                <a href={`${import.meta.env.BASE_URL}daisyui-showcase`} class="dropdown-item">DaisyUI</a>
+                <a href={`${import.meta.env.BASE_URL}starlight-css-guide`} class="dropdown-item">CSS Guide</a>
+                <a href={`${import.meta.env.BASE_URL}bulma`} class="dropdown-item">Bulma Demo</a>
+                <a href={`${import.meta.env.BASE_URL}ff2-navbar-demo`} class="dropdown-item">🚀 FF2 Navbar Demo</a>
+                <a href={`${import.meta.env.BASE_URL}frames`} class="dropdown-item">Frames</a>
+                <a href={`${import.meta.env.BASE_URL}frames-pale`} class="dropdown-item">Frames Pale</a>
+              </div>
+            </DropdownItems>
+          </Dropdown>
+          
+          <a href={`${import.meta.env.BASE_URL}site-design`} class="nav-item">Site Design</a>
+          <a href={`${import.meta.env.BASE_URL}site-engineering`} class="nav-item">Engineering</a>
+          <a href={`${import.meta.env.BASE_URL}in-production`} class="nav-item">Production</a>
+          <a href={`${import.meta.env.BASE_URL}starlight-showcase`} class="nav-item">Starlight</a>
+        </div>
+      </MenuItems>
+      
+      <!-- Right side actions -->
+      <div class="navbar-actions">
+        <div class="search-container">
+          <!-- Search temporarily disabled -->
+          <input type="search" placeholder="Search..." class="search-input" />
+        </div>
+        <div class="theme-container">
+          <span class="theme-icon">🌙</span>
+          <div class="theme-dropdown">
+            <select id="theme-select" class="theme-select">
+              <option value="auto">Auto</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </Astronav>
+  </div>
+</div>
+
+<script>
+  // Theme switching functionality
+  const themeSelect = document.getElementById('theme-select');
+  
+  // Get current theme from localStorage or default to 'auto'
+  const getCurrentTheme = () => {
+    return localStorage.getItem('starlight-theme') || 'auto';
+  };
+  
+  // Set theme in localStorage and apply to document
+  const setTheme = (theme: string) => {
+    localStorage.setItem('starlight-theme', theme);
+    
+    if (theme === 'auto') {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', theme);
+    }
+  };
+  
+  // Initialize theme on page load
+  const initTheme = () => {
+    const currentTheme = getCurrentTheme();
+    if (themeSelect) {
+      (themeSelect as HTMLSelectElement).value = currentTheme;
+    }
+    setTheme(currentTheme);
+  };
+  
+  // Handle theme change
+  if (themeSelect) {
+    themeSelect.addEventListener('change', (e) => {
+      const target = e.target as HTMLSelectElement;
+      if (target) {
+        setTheme(target.value);
+      }
+    });
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTheme);
+  } else {
+    initTheme();
+  }
+</script>
+
+<style>
+/* Top, one line, sans-serif navbar styles - DRAFT VERSION PENDING APPROVAL */
+.custom-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.3rem 0;
+  z-index: 9999;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 0.85rem;
+  height: 50px;
+  min-height: 50px;
+  max-height: 50px;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* Astronav component styling - CSS GRID SINGLE LINE */
+.navbar-container :global(.astronav) {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  height: 40px;
+  width: 100%;
+}
+
+/* Brand styling - COMPACT */
+.navbar-brand {
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.brand-link {
+  color: #fff !important;
+  font-weight: bold;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.brand-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* MenuItems styling - SINGLE LINE GRID */
+.navbar-container :global(.navbar-menu-horizontal) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.menu-items-wrapper {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(60px, auto));
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.menu-items-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-item {
+  color: #ccc;
+  text-decoration: none;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  text-align: center;
+  display: block;
+}
+
+.nav-item:hover {
+  color: #fff;
+}
+
+/* Dropdown styles for astro-navbar */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  color: #ccc;
+  cursor: pointer;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.dropdown-toggle:hover {
+  color: #fff;
+}
+
+/* astro-navbar dropdown styling */
+.navbar-container :global(.dropdown[open] .dropdown-toggle),
+.navbar-container :global(.dropdown[aria-expanded="true"] .dropdown-toggle) {
+  color: #fff;
+}
+
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+  min-width: 150px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 10010;
+}
+
+.dropdown-item {
+  display: block;
+  color: #ccc;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.dropdown-item:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Hide astro-navbar dropdown menu by default */
+.navbar-container :global(.dropdown-menu) {
+  display: none;
+}
+
+/* Show dropdown when open (astro-navbar handles this) */
+.navbar-container :global(.dropdown[open] .dropdown-menu),
+.navbar-container :global(.dropdown[aria-expanded="true"] .dropdown-menu) {
+  display: block;
+}
+
+/* Right side actions - GRID LAYOUT */
+.navbar-actions {
+  display: grid;
+  grid-template-columns: 100px 80px;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: end;
+}
+
+/* Search and theme components styling - GRID */
+.search-container {
+  width: 100px;
+  position: relative;
+  z-index: 10001;
+}
+
+.theme-container {
+  display: grid;
+  grid-template-columns: 20px 60px;
+  gap: 0.3rem;
+  align-items: center;
+  position: relative;
+  z-index: 10001;
+  width: 80px;
+}
+
+.theme-icon {
+  font-size: 1.2rem;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+
+.theme-container:hover .theme-icon {
+  opacity: 1;
+}
+
+/* Override Starlight search styles to fit our navbar */
+.search-container :global(.search) {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  position: relative;
+  z-index: 10001;
+}
+
+.search-container :global(.search input) {
+  background: transparent;
+  color: #fff;
+  border: none;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.search-container :global(.search input::placeholder) {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Theme dropdown styles - COMPACT */
+.theme-dropdown {
+  position: relative;
+}
+
+.theme-select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #fff;
+  padding: 0.3rem 0.4rem;
+  cursor: pointer;
+  font-size: 0.75rem;
+  z-index: 10001;
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: #fff;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+  width: 100%;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.theme-select option {
+  background: #2a2a2a;
+  color: #fff;
+}
+
+/* Add padding to body to prevent content overlap */
+:global(body) {
+  padding-top: 60px !important;
+  padding-bottom: 20px !important;
+}
+
+/* Override Starlight sidebar z-index and height with scrolling */
+:global(.sidebar) {
+  z-index: 100 !important;
+  height: calc(100vh - 120px) !important;
+  max-height: calc(100vh - 120px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent !important;
+}
+
+:global(.sidebar-content) {
+  z-index: 100 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding-bottom: 1rem !important;
+}
+
+:global(.sidebar-pane) {
+  height: calc(100vh - 120px) !important;
+  max-height: calc(100vh - 120px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+:global(.right-sidebar) {
+  height: calc(100vh - 120px) !important;
+  max-height: calc(100vh - 120px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Custom scrollbar styling for webkit browsers */
+:global(.sidebar::-webkit-scrollbar) {
+  width: 6px !important;
+}
+
+:global(.sidebar::-webkit-scrollbar-track) {
+  background: transparent !important;
+}
+
+:global(.sidebar::-webkit-scrollbar-thumb) {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-radius: 3px !important;
+}
+
+:global(.sidebar::-webkit-scrollbar-thumb:hover) {
+  background: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Ensure sidebar navigation items are properly spaced */
+:global(.sidebar nav) {
+  padding-bottom: 2rem !important;
+}
+
+:global(.sidebar ul) {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* Add the required .hidden class for astro-navbar */
+.hidden {
+  display: none;
+}
+
+/* Responsive design - GRID MAINTAINS SINGLE LINE */
+@media (max-width: 768px) {
+  .navbar-container :global(.astronav) {
+    grid-template-columns: auto 1fr auto;
+    gap: 0.5rem;
+  }
+  
+  .menu-items-wrapper {
+    grid-template-columns: repeat(6, minmax(50px, auto));
+    gap: 0.3rem;
+  }
+  
+  .navbar-actions {
+    grid-template-columns: 80px 60px;
+    gap: 0.3rem;
+  }
+  
+  .nav-item,
+  .dropdown-toggle {
+    padding: 0.25rem 0.3rem;
+    font-size: 0.75rem;
+  }
+  
+  .search-container {
+    width: 80px;
+  }
+  
+  .theme-container {
+    grid-template-columns: 15px 45px;
+    width: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-container :global(.astronav) {
+    grid-template-columns: auto 1fr auto;
+    gap: 0.3rem;
+  }
+  
+  .menu-items-wrapper {
+    grid-template-columns: repeat(6, minmax(40px, auto));
+    gap: 0.2rem;
+  }
+  
+  .navbar-actions {
+    grid-template-columns: 60px 50px;
+    gap: 0.2rem;
+  }
+  
+  .nav-item,
+  .dropdown-toggle {
+    padding: 0.2rem 0.25rem;
+    font-size: 0.7rem;
+  }
+  
+  .search-container {
+    width: 60px;
+  }
+  
+  .theme-container {
+    grid-template-columns: 40px;
+    width: 40px;
+  }
+  
+  /* Hide theme icon on very small screens */
+  .theme-icon {
+    display: none;
+  }
+}
+</style>

@@ -34,3 +34,16 @@ What does canvas use? Line segments? Curves? Just refactor for different outputs
 git add .
 git commit -m "Add file from other repo"
 git push
+
+To run a minimal Astro site, you need:
+
+astro.config.mjs (already present)
+package.json (lists dependencies and scripts)
+At least one page, e.g. src/pages/index.astro
+A public folder for static assets (optional, usually public/)
+Node modules (installed via npm install or pnpm install)
+If you want to run the site now, make sure you have:
+
+package.json in your project root
+src/pages/index.astro (or another page in src/pages/)
+Run npm install to install dependencies
