@@ -1,12 +1,12 @@
 ---
-title: "FF2: Responsive Menu Demo"
+title: " Responsive Menu Demo"
 ---
 
 <!-- Responsive Menu with Submenus (from template) -->
 <nav class="navbar-bar">
   <div class="navbar-container">
     <div class="navbar-left">
-      <span class="navbar-brand">Hacker1</span>
+      <span class="navbar-brand">Base-Frank1</span>
     </div>
     <button class="hamburger" id="hamburger-btn" aria-label="Open menu" aria-expanded="false" aria-controls="main-menu">
       <span></span>
@@ -114,7 +114,7 @@ title: "FF2: Responsive Menu Demo"
 </nav>
 
 <main style="padding: 2rem; max-width: 800px; margin: 0 auto;">
- 
+
 </main>
 
 <style>
@@ -314,22 +314,6 @@ body[data-theme="sunset"] {
     width: 100%;
     margin: 0.5em 0;
   }
-  /* Hide all submenus by default on mobile */
-  .submenu {
-    display: none;
-  }
-  /* Show submenu only when parent .dropdown has .open */
-  .dropdown.open > .submenu {
-    display: flex;
-    flex-direction: column;
-    position: static;
-    background: #333;
-    min-width: 180px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    z-index: 1000;
-  }
 }
 @media (min-width: 801px) {
   .mobile-only {
@@ -363,31 +347,24 @@ document.addEventListener('DOMContentLoaded', function() {
   const hamburger = document.getElementById('hamburger-btn');
   const menu = document.getElementById('main-menu');
   if (hamburger && menu) {
-    hamburger.addEventListener('click', function(e) {
-      // Only toggle main menu, not submenus
+    hamburger.addEventListener('click', function() {
       const isOpen = menu.classList.toggle('menu-open');
       hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      // On mobile, close all submenus when menu is opened
-      if (isMobile()) {
-        document.querySelectorAll('.dropdown.open').forEach(function(el) {
-          el.classList.remove('open');
-        });
-      }
     });
   }
   // Light/Dark/Sunset mode switcher
   const modeSelect = document.querySelector('.mode-select');
-  function setTheme(theme) {
+  function setTheme(theme: string) {
     document.body.setAttribute('data-theme', theme);
   }
   if (modeSelect) {
     modeSelect.addEventListener('change', function(e) {
-      const target = e.target;
+      const target = e.target as HTMLSelectElement | null;
       if (target) setTheme(target.value);
     });
     // Set initial theme
-    if (modeSelect.value) {
-      setTheme(modeSelect.value);
+    if ((modeSelect as HTMLSelectElement).value) {
+      setTheme((modeSelect as HTMLSelectElement).value);
     }
   }
   // Mobile/Desktop submenu toggle
@@ -400,27 +377,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-  dropdownToggles.forEach(function(btn) {
+  console.log('Dropdown toggles found:', dropdownToggles.length);
+  dropdownToggles.forEach(function(btn, idx) {
+    console.log('Attaching event to dropdown-toggle', idx, btn);
     btn.addEventListener('click', function(e) {
+      console.log('Dropdown-toggle clicked:', btn, 'Mobile:', isMobile());
       e.preventDefault();
       const parent = btn.parentElement;
       if (parent && parent.classList.contains('open')) {
         parent.classList.remove('open');
+        console.log('Dropdown closed');
       } else if (parent) {
         closeAllDropdowns();
         parent.classList.add('open');
+        console.log('Dropdown opened');
       }
     });
-  });
-  // Close dropdowns when clicking outside (desktop only)
-  document.addEventListener('click', function(e) {
-    if (!isMobile()) {
-      const isDropdown = e.target.closest('.dropdown');
-      const isToggle = e.target.closest('.dropdown-toggle');
-      if (!isDropdown && !isToggle) {
-        closeAllDropdowns();
-      }
-    }
   });
   // Optional: close dropdowns when resizing to desktop
   window.addEventListener('resize', function() {

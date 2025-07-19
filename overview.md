@@ -73,3 +73,5 @@ Example (automatic list for content collection):
 
 
 This way, new docs/pages  are automatically added to the list.
+
+i am missing some edits. the problem is that when i click on a menu, it drops down correctly, but when i click outside the menu list, it does not disappear. this is on desktop mode. on mobile mode, once i click the hamburger, all the submenues show. They should only appear when i click on the main menu name.
