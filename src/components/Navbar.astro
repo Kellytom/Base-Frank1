@@ -6,7 +6,14 @@ title: "FF2: Responsive Menu Demo"
 <nav class="navbar-bar">
   <div class="navbar-container">
     <div class="navbar-left">
-      <span class="navbar-brand">Hacker1</span>
+      <span class="navbar-brand">Base-Frank1</span>
+      <a href="/map" class="navbar-map-link" style="display:inline-flex;align-items:center;margin-left:0.5em;text-decoration:none;color:#e8d5b7;font-weight:bold;">
+      <a href="/map" class="navbar-map-link">
+        <span class="map-btn">
+          <i class="fa fa-power-off" aria-hidden="true"></i>
+          <span style="margin-left:0.4em;">Map</span>
+        </span>
+      </a>
     </div>
     <button class="hamburger" id="hamburger-btn" aria-label="Open menu" aria-expanded="false" aria-controls="main-menu">
       <span></span>
@@ -89,14 +96,23 @@ title: "FF2: Responsive Menu Demo"
       </li>
       <li class="dropdown">
         <button class="dropdown-toggle" tabindex="0">
-          <span>Menu 5</span>
+          <span>Play</span>
         </button>
         <ul class="submenu">
-          <li><a href="/menu5/sub1">Submenu 5-1</a></li>
-          <li><a href="/menu5/sub2">Submenu 5-2</a></li>
-          <li><a href="/menu5/sub3">Submenu 5-3</a></li>
-          <li><a href="/menu5/sub4">Submenu 5-4</a></li>
-          <li><a href="/menu5/sub5">Submenu 5-5</a></li>
+          <li><a href="/play/paper">Paper</a></li>
+          <li><a href="/play/computer">Computer</a></li>
+          <li><a href="/play/real-world">Real World</a></li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <button class="dropdown-toggle" tabindex="0">
+          <span>Work</span>
+        </button>
+        <ul class="submenu">
+          <li><a href="/work/cx">CX</a></li>
+          <li><a href="/work/gr">GR</a></li>
+          <li><a href="/work/jp">JP</a></li>
+          <li><a href="/work/etc">Etc.</a></li>
         </ul>
       </li>
       <li class="dropdown">
@@ -107,6 +123,8 @@ title: "FF2: Responsive Menu Demo"
           <li><a href="#future">future expansion</a></li>
           <li><a href="#experimental">experimental</a></li>
           <li><a href="#untested">untested</a></li>
+
+          <li><a href="/Attribution/">Attrib</a></li>
         </ul>
       </li>
     </ul>
@@ -155,6 +173,9 @@ body {
   font-weight: bold;
   margin-right: .2rem;
   letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 .menu {
   display: flex;
@@ -368,7 +389,37 @@ body[data-theme="sunset"] {
     display: block;
   }
 }
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+.navbar-map-link {
+  margin-left: 0.7em;
+  text-decoration: none;
+}
+.map-btn {
+  display: inline-flex;
+  align-items: center;
+  background: #444;
+  color: #e8d5b7;
+  border-radius: 6px;
+  padding: 0.3em 0.9em;
+  font-weight: bold;
+  font-size: 1em;
+  border: 2px solid #b8956a;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  transition: background 0.2s, color 0.2s;
+}
+.map-btn:hover {
+  background: #b8956a;
+  color: #222;
+}
+.map-btn i.fa-power-off {
+  font-size: 1.1em;
+  margin-right: 0.3em;
+}
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
 <script>
 // Hamburger menu toggle (vanilla JS)
