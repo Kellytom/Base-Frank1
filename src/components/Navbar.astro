@@ -113,7 +113,7 @@ title: "FF2: Responsive Menu Demo"
   </div>
 </nav>
 
-<main style="padding: 2rem; max-width: 800px; margin: 0 auto;">
+<main style="padding: 2rem; max-width: 800px; margin: 0 auto; margin-top: 70px;">
  
 </main>
 
@@ -127,8 +127,10 @@ body {
 }
 .navbar-bar {
   width: 100%;
-  background: #222;
+  background: rgba(60, 40, 80, 0.6); /* dark muted purple, 60% opacity */
   box-sizing: border-box;
+  z-index: 3000;
+  position: relative;
 }
 .navbar-container {
   display: flex;
@@ -162,6 +164,8 @@ body {
   padding: 0;
   flex-shrink: 1;
   min-width: 0;
+  background: rgba(60, 40, 80, 0.6); /* dark muted purple, 60% opacity */
+  backdrop-filter: blur(2px);
 }
 .menu > li {
   min-width: 0;
@@ -169,12 +173,15 @@ body {
 .dropdown {
   position: relative;
 }
-.menu > li > a {
-  display: block;
-  padding: .5em .55em;
-  color: #fff;
-  text-decoration: none;
-  transition: background 0.2s;
+.menu > li > a,
+.dropdown-toggle,
+.submenu li a {
+  color: #e8d5b7;
+  font-size: 1rem;
+  border-bottom: 3px solid #b8956a;
+  padding-bottom: 0.5rem;
+  text-align: left;
+  font-family: inherit;
 }
 .menu > li > a:hover,
 .menu > li:focus-within > a {
@@ -196,9 +203,12 @@ body {
 .submenu li a {
   display: block;
   padding: 0.75em 1.5em;
-  color: #fff;
+  color: #e8d5b7;
   text-decoration: none;
   transition: background 0.2s;
+  background: rgba(60, 40, 80, 1); /* solid dark muted purple for submenu items */
+  border-radius: 6px;
+  margin: 2px 8px;
 }
 .submenu li a:hover {
   background: #555;
@@ -293,11 +303,12 @@ body[data-theme="sunset"] {
     display: none;
     flex-direction: column;
     width: 100%;
-    background: #222;
+    background: rgba(60, 40, 80, 0.9); /* dark muted purple, 90% opacity for mobile */
     position: absolute;
     left: 0;
     top: 60px;
     z-index: 1500;
+    backdrop-filter: blur(2px);
   }
   .menu.menu-open {
     display: flex;
@@ -323,12 +334,13 @@ body[data-theme="sunset"] {
     display: flex;
     flex-direction: column;
     position: static;
-    background: #333;
+    background: rgba(83, 70, 95, 0.9); /* dark muted purple, 90% opacity for mobile */
     min-width: 180px;
     list-style: none;
     margin: 0;
     padding: 0;
     z-index: 1000;
+    backdrop-filter: blur(2px);
   }
 }
 @media (min-width: 801px) {
@@ -343,12 +355,13 @@ body[data-theme="sunset"] {
     position: absolute;
     left: 0;
     top: 100%;
-    background: #333;
+    background: rgba(72, 64, 80, 0.9); /* dark muted purple, 90% opacity */
     min-width: 180px;
     list-style: none;
     margin: 0;
     padding: 0;
     z-index: 1000;
+    backdrop-filter: blur(2px);
   }
   /* Removed hover/focus logic for desktop submenus */
   .dropdown.open > .submenu {
