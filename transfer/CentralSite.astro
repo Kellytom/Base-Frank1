@@ -109,6 +109,20 @@ const categories = [
       </div>
     </section>
 
+    <!-- Automatic Link List for all .md and .astro pages in src/pages -->
+    <section class="section">
+      <h2 class="section-title">All Pages & Docs</h2>
+      <ul>
+        {Object.entries(import.meta.glob('../pages/*.{md,astro}', { eager: true })).map(([path, mod]) => (
+          <li>
+            <a href={path.replace('../pages/', '/').replace('.md', '').replace('.astro', '')}>
+              {mod.frontmatter?.title ?? path.replace('../pages/', '').replace('.md', '').replace('.astro', '')}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
     <!-- Main Satellite Sites Section -->
     <section class="section">
       <h2 class="section-title">Development Ecosystem Sites</h2>

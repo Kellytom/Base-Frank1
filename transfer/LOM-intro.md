@@ -1,3 +1,6 @@
+---
+title: Legion of Mary Introduction
+---
 ## **The Legion of Mary in Rhode Island**
 
 To Jesus Through Mary

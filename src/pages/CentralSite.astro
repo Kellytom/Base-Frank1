@@ -1,5 +1,6 @@
 ---
-import Navbar from './Navbar.astro';
+import Navbar from '../components/Navbar.astro';
+const pages = import.meta.glob('./*.{md,astro}', { eager: true });
 
 const categories = [
   {
@@ -36,8 +37,8 @@ const categories = [
   <header class="hero">
     <div class="hero-body">
       <div class="container">
-        <h1 class="title is-3">Hacker1</h1>
-        <h2 class="subtitle is-5">Development Ecosystem v1.0</h2>
+        <h1 class="title is-3">Base-Frank1</h1>
+        <h2 class="subtitle is-5">Development System v1.0</h2>
         <p class="hero-description">
           "In the beginning was the Word, and the Word was with God, and the Word was God." - John 1:1
         </p>
@@ -109,9 +110,28 @@ const categories = [
       </div>
     </section>
 
+    <!--  link to LOM-intro page -->
+    <section class="section">
+      <h2 class="section-title">Featured Docs</h2>
+ 
+   
+
+<ul>
+  {Object.entries(pages)
+    .filter(([path]) => path !== './index.astro')
+    .map(([path, mod]) => (
+      <li>
+        <a href={path.replace('./', '/').replace('.md', '').replace('.astro', '')}>
+          {mod.frontmatter?.title ?? path.replace('./', '').replace('.md', '').replace('.astro', '')}
+        </a>
+      </li>
+    ))}
+</ul>
+ </section>
+
     <!-- Main Satellite Sites Section -->
     <section class="section">
-      <h2 class="section-title">Development Ecosystem Sites</h2>
+      <h2 class="section-title">Development System</h2>
       <div class="columns is-multiline">
         {categories.map(category => (
           <div class="column is-half">
@@ -137,10 +157,8 @@ const categories = [
     <section class="section">
       <div class="about-section">
         <div class="content about-content">
-          <h2>About Hacker1</h2>
-          <p>
-            "Whatever you do, work at it with all your heart, as working for the Lord, not for human masters." - Colossians 3:23
-          </p>
+          <h2>About Base-Frank1</h2>
+ 
           <p>
             This platform represents the complete software development lifecycle, from initial planning 
             through production deployment. Each satellite site focuses on a specific aspect of the development process.
