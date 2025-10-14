@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Triangle Debug View</title>
+  <style>
+    html,body{margin:0;height:100%;overflow:hidden;background:#f0e6ef;font-family:system-ui,sans-serif}
+    canvas{width:100%;height:100%;display:block;touch-action:none}
+    #hud{position:fixed;top:10px;left:10px;z-index:10}
+    #coords{background:rgba(255,255,255,0.8);padding:6px 10px;border-radius:6px;font-size:13px;color:#333;margin-bottom:8px}
+    #instructions{background:rgba(255,255,255,0.85);padding:10px 14px;border-radius:10px;font-size:14px;color:#444;max-width:320px}
+    #instructions h3{margin:0 0 6px;font-size:16px;color:#6b5b95}
+    #debug{position:fixed;bottom:0;left:0;width:100%;background:rgba(0,0,0,0.8);color:#00ffcc;font-family:monospace;font-size:12px;padding:6px 8px;box-sizing:border-box;white-space:pre;z-index:20}
+  </style>
+</head>
+<body>
+  <canvas id="webglCanvas"></canvas>
+  <div id="hud">
+    <div id="coords">x: 0, y: 0, θ: 0°</div>
+    <div id="instructions">
+      <h3>Controls</h3>
+      <ul>
+        <li><b>Mouse:</b> Move to aim, click to thrust</li>
+        <li><b>Touch:</b> Drag to aim, hold to thrust</li>
+      </ul>
+    </div>
+  </div>
+  <div id="debug"></div>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById("webglCanvas");
+      const gl = canvas.getContext("webgl", { antialias: true });
+      const coordText = document.getElementById("coords");
+      const debugText = document.getElementById("debug");
+      if (!gl) { alert("WebGL not supported"); return; }
+
+      function resizeCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.max(1, Math.floor(window.innerWidth * dpr));
+        canvas.height = Math.max(1, Math.floor(window.innerHeight * dpr));
+        canvas.style.width = window.innerWidth + "px";
+        canvas.style.height = window.innerHeight + "px";
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      }
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      // Ship geometry: position(x,y) + color(r,g,b,a)
+      const shipVerts = new Float32Array([
+         0.0,  5.0,   0.0, 0.1, 0.4, 1.0,
+        -3.0, -3.0,   0.6, 0.7, 1.0, 1.0,
+         3.0, -3.0,   0.6, 0.7, 1.0, 1.0
+      ]);
+
+      // Flame geometry positions only; colors will be written into buffer dynamically
+      const flameBaseVerts = new Float32Array([
+        0.0, -4.5,  0.0, 0.0, 0.0, 1.0,
+       -1.2, -1.5,  0.0, 0.0, 0.0, 1.0,
+        1.2, -1.5,  0.0, 0.0, 0.0, 1.0
+      ]);
+
+      const vsSource = `
+        attribute vec2 a_position;
+        attribute vec4 a_color;
+        varying vec4 v_color;
+        uniform vec2 u_translation;
+        uniform float u_rotation;
+        uniform mat4 u_projection;
+        void main() {
+          float c = cos(u_rotation);
+          float s = sin(u_rotation);
+          vec2 rotated = vec2(
+            a_position.x * c - a_position.y * s,
+            a_position.x * s + a_position.y * c
+          );
+          gl_Position = u_projection * vec4(rotated + u_translation, 0.0, 1.0);
+          v_color = a_color;
+        }
+      `;
+      const fsSource = `
+        precision mediump float;
+        varying vec4 v_color;
+        void main() { gl_FragColor = v_color; }
+      `;
+
+      function makeShader(type, src) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+          console.error(gl.getShaderInfoLog(s));
+        }
+        return s;
+      }
+
+      const vs = makeShader(gl.VERTEX_SHADER, vsSource);
+      const fs = makeShader(gl.FRAGMENT_SHADER, fsSource);
+      const program = gl.createProgram();
+      gl.attachShader(program, vs);
+      gl.attachShader(program, fs);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error(gl.getProgramInfoLog(program));
+      }
+      gl.useProgram(program);
+
+      // Buffers
+      const shipBuf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, shipBuf);
+      gl.bufferData(gl.ARRAY_BUFFER, shipVerts, gl.STATIC_DRAW);
+
+      const flameBuf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, flameBuf);
+      // initialize with base verts (colors zero)
+      gl.bufferData(gl.ARRAY_BUFFER, flameBaseVerts, gl.DYNAMIC_DRAW);
+
+      const stride = 6 * Float32Array.BYTES_PER_ELEMENT;
+      const aPos = gl.getAttribLocation(program, "a_position");
+      const aCol = gl.getAttribLocation(program, "a_color");
+
+      const uTrans = gl.getUniformLocation(program, "u_translation");
+      const uRot = gl.getUniformLocation(program, "u_rotation");
+      const uProj = gl.getUniformLocation(program, "u_projection");
+
+      function makeOrtho(l, r, b, t) {
+        return new Float32Array([
+          2 / (r - l), 0, 0, 0,
+          0, 2 / (t - b), 0, 0,
+          0, 0, 1, 0,
+          -(r + l) / (r - l), -(t + b) / (t - b), 0, 1
+        ]);
+      }
+      const projection = makeOrtho(-100, 100, -100, 100);
+      gl.uniformMatrix4fv(uProj, false, projection);
+
+      // State
+      let pos = { x: 0, y: 0 };
+      let vel = { x: 0, y: 0 };
+      let rot = 0; // model-space rotation where 0 = pointing up (ship tip)
+      let thrust = false;
+      let last = 0;
+      let holdTimer = null;
+      let lastTouch = null;
+      let thrustLevel = 0;
+
+      // Convert client coords -> world coords
+      function screenToWorld(clientX, clientY) {
+        const rect = canvas.getBoundingClientRect();
+        const cx = clientX - rect.left;
+        const cy = clientY - rect.top;
+        const dpr = window.devicePixelRatio || 1;
+        const px = cx * dpr;
+        const py = cy * dpr;
+        const nx = (px / canvas.width) * 200 - 100;
+        const ny = -((py / canvas.height) * 200 - 100);
+        return { x: nx, y: ny };
+      }
+
+      // Aim function: returns angle so that 0 = up (model's tip)
+      function aimAt(worldX, worldY) {
+        return Math.atan2(worldY - pos.y, worldX - pos.x) - Math.PI / 2;
+      }
+
+      // Mouse controls
+      canvas.addEventListener("mousemove", e => {
+        const wp = screenToWorld(e.clientX, e.clientY);
+        rot = aimAt(wp.x, wp.y);
+      });
+      canvas.addEventListener("mousedown", () => { thrust = true; });
+      window.addEventListener("mouseup", () => { thrust = false; });
+
+      // Touch controls
+      canvas.addEventListener("touchstart", e => {
+        e.preventDefault();
+        const t = e.touches[0];
+        lastTouch = { x: t.clientX, y: t.clientY };
+        const wp = screenToWorld(lastTouch.x, lastTouch.y);
+        rot = aimAt(wp.x, wp.y);
+        holdTimer = setTimeout(() => { thrust = true; }, 250);
+      }, { passive: false });
+
+      canvas.addEventListener("touchmove", e => {
+        const t = e.touches[0];
+        lastTouch = { x: t.clientX, y: t.clientY };
+        const wp = screenToWorld(lastTouch.x, lastTouch.y);
+        rot = aimAt(wp.x, wp.y);
+      }, { passive: false });
+
+      canvas.addEventListener("touchend", () => {
+        clearTimeout(holdTimer);
+        thrust = false;
+        lastTouch = null;
+      });
+
+      // Update flame buffer colors based on thrustLevel (0..1)
+      function updateFlameBuffer(level) {
+        // orange: (1.0, 0.45, 0.05)
+        const r = 1.0 * level;
+        const g = 0.45 * level;
+        const b = 0.05 * level;
+        // build interleaved array x,y,r,g,b,a per vertex using positions from flameBaseVerts
+        const arr = new Float32Array(3 * 6);
+        for (let i = 0; i < 3; i++) {
+          arr[i*6 + 0] = flameBaseVerts[i*6 + 0]; // x
+          arr[i*6 + 1] = flameBaseVerts[i*6 + 1]; // y
+          arr[i*6 + 2] = r;
+          arr[i*6 + 3] = g;
+          arr[i*6 + 4] = b;
+          arr[i*6 + 5] = 1.0;
+        }
+        gl.bindBuffer(gl.ARRAY_BUFFER, flameBuf);
+        // replace entire buffer data (positions + colors)
+        gl.bufferData(gl.ARRAY_BUFFER, arr, gl.DYNAMIC_DRAW);
+      }
+
+      // init flame as black
+      updateFlameBuffer(0);
+
+      function render(now) {
+        const dt = (now - last) / 1000 || 0;
+        last = now;
+
+        // Ramp thrustLevel smoothly 0..1
+        const target = thrust ? 1 : 0;
+        const rampSpeed = 8;
+        thrustLevel += (target - thrustLevel) * Math.min(1, rampSpeed * dt);
+
+        // If thrusting and finger present, continuously aim at finger
+        if (thrust && lastTouch) {
+          const wp = screenToWorld(lastTouch.x, lastTouch.y);
+          rot = aimAt(wp.x, wp.y);
+        }
+
+        // Apply thrust. Since aimAt returns rot where 0=up, use rot + PI/2 for world-space acceleration
+        if (thrust) {
+          const thrustAngle = rot + Math.PI / 2;
+          const acc = 40;
+          vel.x += Math.cos(thrustAngle) * acc * dt;
+          vel.y += Math.sin(thrustAngle) * acc * dt;
+        }
+
+        // Integrate position
+        pos.x += vel.x * dt;
+        pos.y += vel.y * dt;
+
+        // Damping
+        const dampingPerSec = 0.02;
+        vel.x *= Math.pow(1 - dampingPerSec, dt * 60);
+        vel.y *= Math.pow(1 - dampingPerSec, dt * 60);
+
+        // Wrap
+        if (pos.x > 100) pos.x = -100;
+        if (pos.x < -100) pos.x = 100;
+        if (pos.y > 100) pos.y = -100;
+        if (pos.y < -100) pos.y = 100;
+
+        // Update flame colors based on thrustLevel (slightly amplify level for visibility)
+        updateFlameBuffer(Math.min(1, thrustLevel * 1.1));
+
+        // HUD / debug
+        coordText.textContent = `x: ${pos.x.toFixed(1)}, y: ${pos.y.toFixed(1)}, θ: ${(rot * 180/Math.PI).toFixed(0)}°`;
+        debugText.textContent = [
+          `pos.x=${pos.x.toFixed(2)}  pos.y=${pos.y.toFixed(2)}`,
+          `vel.x=${vel.x.toFixed(2)}  vel.y=${vel.y.toFixed(2)}`,
+          `rot=${(rot * 180/Math.PI).toFixed(1)}°`,
+          `thrust=${thrust}`,
+          `thrustLevel=${thrustLevel.toFixed(2)}`,
+          `dt=${dt.toFixed(3)}`
+        ].join("\n");
+
+        // Clear
+        gl.clearColor(0.94, 0.91, 0.96, 1);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        // Draw ship (on top)
+        gl.bindBuffer(gl.ARRAY_BUFFER, shipBuf);
+        gl.enableVertexAttribArray(aPos);
+        gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, stride, 0);
+        gl.enableVertexAttribArray(aCol);
+        gl.vertexAttribPointer(aCol, 4, gl.FLOAT, false, stride, 2 * Float32Array.BYTES_PER_ELEMENT);
+        gl.uniform2f(uTrans, pos.x, pos.y);
+        gl.uniform1f(uRot, rot);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        // Draw flame (behind ship visually because it's drawn second but model places it behind)
+        gl.bindBuffer(gl.ARRAY_BUFFER, flameBuf);
+        gl.enableVertexAttribArray(aPos);
+        gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, stride, 0);
+        gl.enableVertexAttribArray(aCol);
+        gl.vertexAttribPointer(aCol, 4, gl.FLOAT, false, stride, 2 * Float32Array.BYTES_PER_ELEMENT);
+        gl.uniform2f(uTrans, pos.x, pos.y);
+        gl.uniform1f(uRot, rot);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+        requestAnimationFrame(render);
+      }
+
+      requestAnimationFrame(render);
+    })();
+  </script>
+</body>
+</html>
